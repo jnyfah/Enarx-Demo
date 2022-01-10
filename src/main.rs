@@ -58,7 +58,7 @@ fn main() {
         best_max_iterations, best_threshold
     );
     let y:f32 = 100.0;
-    println!("accuracy {}", max_accuracy_confusion_matrix.accuracy()*y, "accuracy {}",);
+    println!("accuracy {}%", max_accuracy_confusion_matrix.accuracy()*y,);
     println!("precision {}", max_accuracy_confusion_matrix.precision(),);
     println!("recall {}", max_accuracy_confusion_matrix.recall(),);
 }
