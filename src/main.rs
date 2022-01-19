@@ -1,174 +1,64 @@
-use csv::ReaderBuilder;
-use linfa::prelude::*;
-use linfa_logistic::LogisticRegression;
-use ndarray::{prelude::*, OwnedRepr};
-use ndarray_csv::Array2Reader;
-use plotlib::{
-    grid::Grid,
-    page::Page,
-    repr::Plot,
-    style::{PointMarker, PointStyle},
-    view::{ContinuousView, View},
-};
+#![allow(non_snake_case)]
+use rml::knn;
+use rml::math;
+use std::error::Error;
+use std::time::Instant;
 
-fn main() {
-    let train = load_data("data/train.csv");
-    let test = load_data("data/test.csv");
+const TRAIN_FILE_NAME: &str = "data/train.csv";
+const TEST_FILE_NAME: &str = "data/test.csv";
 
-    let features = train.nfeatures();
-    let targets = train.ntargets();
+type CSVOutput = (Vec<Vec<f64>>, Vec<i32>);
 
-    println!(
-        "training with {} samples, testing with {} samples, {} features and {} target",
-        train.nsamples(),
-        test.nsamples(),
-        features,
-        targets
-    );
+fn parse_csv(data: &str) -> Result<CSVOutput, Box<dyn Error>> {
+    let mut out_data: CSVOutput = (Vec::new(), Vec::new());
+    let mut reader = csv::ReaderBuilder::new()
+        .has_headers(true)
+        .from_path(data)?;
 
-    println!("plotting data...");
-    plot_data(&train);
-
-    println!("training and testing model...");
-    let mut max_accuracy_confusion_matrix = iterate_with_values(&train, &test, 0.01, 100);
-    let mut best_threshold = 0.0;
-    let mut best_max_iterations = 0;
-    let mut threshold = 0.02;
-
-    for max_iterations in (1000..5000).step_by(500) {
-        while threshold < 1.0 {
-            let confusion_matrix = iterate_with_values(&train, &test, threshold, max_iterations);
-
-            if confusion_matrix.accuracy() > max_accuracy_confusion_matrix.accuracy() {
-                max_accuracy_confusion_matrix = confusion_matrix;
-                best_threshold = threshold;
-                best_max_iterations = max_iterations;
-            }
-            threshold += 0.01;
+    for line in reader.records() {
+        let result = line?;
+        let mut line_data: (Vec<f64>, i32) = (Vec::new(), 0);
+        line_data.1 = (result.get(result.len() - 1).unwrap()).parse()?;
+        for i in 0..result.len() - 1 {
+            line_data.0.push((result.get(i).unwrap()).parse()?);
         }
-        threshold = 0.02;
+
+        out_data.0.push(line_data.0);
+        out_data.1.push(line_data.1);
     }
+    Ok(out_data)
+}
+
+
+fn main() -> Result<(), Box<dyn Error>> {
+    // Format: (Vectors of each feature, Vector of class label)
+    let training_data = parse_csv(TRAIN_FILE_NAME)?;
+    let testing_data = parse_csv(TEST_FILE_NAME)?;
+
+    let start = Instant::now();
+
+    let knn = knn::KNN::new(
+        5,
+        training_data.0,
+        training_data.1,
+        None,
+        Some(math::norm::Norm::L2),
+    );
+
+    let pred: Vec<i32> = testing_data.0.iter().map(|x| knn.predict(x)).collect();
+
+    let num_correct = pred
+        .iter()
+        .cloned()
+        .zip(&testing_data.1)
+        .filter(|(a, b)| *a == **b)
+        .count();
 
     println!(
-        "most accurate confusion matrix: {:?}",
-        max_accuracy_confusion_matrix
-    );
-    println!(
-        "with max_iterations: {}, threshold: {}",
-        best_max_iterations, best_threshold
-    );
-    let y:f32 = 100.0;
-    println!("accuracy {}%", max_accuracy_confusion_matrix.accuracy()*y,);
-    println!("precision {}", max_accuracy_confusion_matrix.precision(),);
-    println!("recall {}", max_accuracy_confusion_matrix.recall(),);
-}
-
-fn iterate_with_values(
-    train: &DatasetBase<
-        ArrayBase<OwnedRepr<f64>, Dim<[usize; 2]>>,
-        ArrayBase<OwnedRepr<&'static str>, Dim<[usize; 2]>>,
-    >,
-    test: &DatasetBase<
-        ArrayBase<OwnedRepr<f64>, Dim<[usize; 2]>>,
-        ArrayBase<OwnedRepr<&'static str>, Dim<[usize; 2]>>,
-    >,
-    threshold: f64,
-    max_iterations: u64,
-) -> ConfusionMatrix<&'static str> {
-    let model = LogisticRegression::default()
-        .max_iterations(max_iterations)
-        .gradient_tolerance(0.0001)
-        .fit(train)
-        .expect("can train model");
-
-    let validation = model.set_threshold(threshold).predict(test);
-
-    let confusion_matrix = validation
-        .confusion_matrix(test)
-        .expect("can create confusion matrix");
-
-    confusion_matrix
-}
-
-fn load_data(path: &str) -> Dataset<f64, &'static str> {
-    let mut reader = ReaderBuilder::new()
-        .has_headers(false)
-        .delimiter(b',')
-        .from_path(path)
-        .expect("can create reader");
-
-    let array: Array2<f64> = reader
-        .deserialize_array2_dynamic()
-        .expect("can deserialize array");
-
-    let (data, targets) = (
-        array.slice(s![.., 0..8]).to_owned(),
-        array.column(8).to_owned(),
+        "Accuracy: {} Runtime: {}s",
+        (num_correct as f64) / (pred.len() as f64),
+        start.elapsed().as_secs_f64()
     );
 
-    let feature_names = vec!["test 1", "test 2"];
-
-    Dataset::new(data, targets)
-        .map_targets(|x| {
-            if *x as usize == 1 {
-                "accepted"
-            } else {
-                "denied"
-            }
-        })
-        .with_feature_names(feature_names)
-}
-
-fn plot_data(
-    train: &DatasetBase<
-        ArrayBase<OwnedRepr<f64>, Dim<[usize; 2]>>,
-        ArrayBase<OwnedRepr<&'static str>, Dim<[usize; 2]>>,
-    >,
-) {
-    let mut positive = vec![];
-    let mut negative = vec![];
-
-    let records = train.records().clone().into_raw_vec();
-    let features: Vec<&[f64]> = records.chunks(2).collect();
-    let targets = train.targets().clone().into_raw_vec();
-    for i in 0..features.len() {
-        let feature = features.get(i).expect("feature exists");
-        if let Some(&"accepted") = targets.get(i) {
-            positive.push((feature[0], feature[1]));
-        } else {
-            negative.push((feature[0], feature[1]));
-        }
-    }
-
-    let plot_positive = Plot::new(positive)
-        .point_style(
-            PointStyle::new()
-                .size(2.0)
-                .marker(PointMarker::Square)
-                .colour("#00ff00"),
-        )
-        .legend("Exam Results".to_string());
-
-    let plot_negative = Plot::new(negative).point_style(
-        PointStyle::new()
-            .size(2.0)
-            .marker(PointMarker::Circle)
-            .colour("#ff0000"),
-    );
-
-    let grid = Grid::new(0, 0);
-
-    let mut image = ContinuousView::new()
-        .add(plot_positive)
-        .add(plot_negative)
-        .x_range(0.0, 120.0)
-        .y_range(0.0, 120.0)
-        .x_label("Test 1")
-        .y_label("Test 2");
-
-    image.add_grid(grid);
-
-    Page::single(&image)
-        .save("plot.svg")
-        .expect("can generate svg for plot");
+    Ok(())
 }
