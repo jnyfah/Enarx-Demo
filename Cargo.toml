@@ -8,6 +8,4 @@ edition = "2021"
 [dependencies]
 rml = "0.1.0"
 csv = "1.1"
-polars = "0.14.2"
-polars-core = {version = "0.14.2", features=["ndarray"]}
-arrow = "4.3.0"
+wasmedge-wasi-helper = "=0.2.0"

@@ -1,11 +1,10 @@
 #![allow(non_snake_case)]
 use rml::knn;
+use std::env;
 use rml::math;
 use std::error::Error;
 use std::time::Instant;
 
-const TRAIN_FILE_NAME: &str = "data/train.csv";
-const TEST_FILE_NAME: &str = "data/test.csv";
 
 type CSVOutput = (Vec<Vec<f64>>, Vec<i32>);
 
@@ -31,9 +30,13 @@ fn parse_csv(data: &str) -> Result<CSVOutput, Box<dyn Error>> {
 
 
 fn main() -> Result<(), Box<dyn Error>> {
+    let args: Vec<String> = env::args().collect();
+    println!("{}", args[2]);
+    println!("{}", args[1]);
+
     // Format: (Vectors of each feature, Vector of class label)
-    let training_data = parse_csv(TRAIN_FILE_NAME)?;
-    let testing_data = parse_csv(TEST_FILE_NAME)?;
+    let training_data = parse_csv(&args[1])?;
+    let testing_data = parse_csv(&args[2])?;
 
     let start = Instant::now();
 
