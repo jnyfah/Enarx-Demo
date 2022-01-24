@@ -1,4 +1,5 @@
 #![allow(non_snake_case)]
+
 use ndarray::{Array1, Array2, Axis, Slice};
 use serde::Deserialize;
 use std::error::Error;
@@ -112,7 +113,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     //println!("yhat train shape: {:?}", yhat_train.shape());
     //println!("yhat test shape: {:?}", yhat_test.shape());
-    
+
     let mae_train = (&yhat_train - &train_dataset.labels)
         .map(|y| y.abs())
         .mean()
@@ -124,14 +125,14 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     println!("");
 
-    let _Train_Accuracy = (1.0-mae_train)*100.0;
-    let _Test_Accuracy = (1.0-mae_test)*100.0;
+    let _train_accuracy = (1.0-mae_train)*100.0;
+    let _test_accuracy = (1.0-mae_test)*100.0;
 
     //println!("Tree size: {}", &decision_tree.size());
 
-    println!("Train Accuracy: {:?} %", _Train_Accuracy);
+    println!("Train Accuracy: {:?} %", _train_accuracy);
 
-    println!("Test Accuracy: {:?} %", _Test_Accuracy);
+    println!("Test Accuracy: {:?} %", _test_accuracy);
 
     //println!("MAE Train: {:?}", mae_train);
     //println!("MAE Test: {:?}", mae_test);
