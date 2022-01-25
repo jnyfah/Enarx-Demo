@@ -1,4 +1,6 @@
-# Simple Enarx-Demo
+![example workflow](https://github.com/jnyfah/Enarx-Demo/actions/workflows/rust.yml/badge.svg)
+# Enarx-Demo 
+
 This demo shows how to easily deploy a simple machine learning workload to Trusted Execution Enviroment on a host using Enarx. In this example it is assumed that the user wants to protect the machine model by training the model in a TEE using an external data the workload has been given access to.
 
 The Tee is where the training and processing takes place, this ensures model remains confidential during processing as this gurantees data confidentiality, code integrity and data integrity.
