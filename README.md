@@ -9,7 +9,6 @@ In this demo a simple ML model using decision tree algorithm was created on the 
 
 The decision tree Algorithm belongs to the family of supervised machine learning algorithms. It can be used for both a classification problems as well as for regression problems. It is a tree-structured classifier, where internal nodes represent the features of a dataset, branches represent the decision rules and each leaf node represents the outcome. You can read more on decision algorithm trees [here](https://towardsdatascience.com/a-guide-to-decision-trees-for-machine-learning-and-data-science-fe2607241956)
 
-
 ## Environment setup
 
 To compile this demo, you must install the following.
@@ -20,10 +19,27 @@ Go to [rust-lang.org](https://www.rust-lang.org/tools/install) and follow the in
 
 #### WebAssembly System Interface (WASI)
 
-install WASM Pack
+install Wastime
 
 ```bash
-cargo install wasm-pack
+curl https://wasmtime.dev/install.sh -sSf | bash
 ```
-for more info on wasi visit this [WASI](https://github.com/WebAssembly/WASI) and for tutorials on how to compile diffrent languages to visit [here](https://github.com/enarx/outreachy)
+
+#### Install Enarx
+ 
+ Visit [Enarx Project home page](https://enarx.dev/docs/Installation/Enarx) and follow the instructons
+
+#### Code
+
+```bash
+ git clone https://github.com/jnyfah/Enarx-Demo
+ cd Enarx-Demo
+ cargo build
+ cargo run data/diabetes.csv
+```
+
+*Please see [this wiki page](https://github.com/jnyfah/Enarx-Demo/wiki) for instructions.*
+
+
+*Please see [this wiki page](https://github.com/jnyfah/Enarx-Demo/wiki) for instructions.*
 
