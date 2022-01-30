@@ -38,8 +38,5 @@ curl https://wasmtime.dev/install.sh -sSf | bash
  cargo run data/diabetes.csv
 ```
 
-*Please see [this wiki page](https://github.com/jnyfah/Enarx-Demo/wiki) for instructions.*
-
-
-*Please see [this wiki page](https://github.com/jnyfah/Enarx-Demo/wiki) for instructions.*
+**Please see [this wiki page](https://github.com/jnyfah/Enarx-Demo/wiki) for instructions.**
 
