@@ -11,7 +11,7 @@ use Enarx_Demo::Tree;
 
 
 #[derive(Debug, Deserialize)]
-struct BostonRecord {
+struct DiabetesRecord {
     Pregnancies: f64,
     Glucose: f64,
     BloodPressure: f64,
@@ -23,13 +23,13 @@ struct BostonRecord {
     Outcome: f64,
 }
 
-struct BostonDataSet {
+struct DiabetesDataSet {
     features: Array2<f64>,
     labels: Array1<f64>,
 }
 
-impl BostonDataSet {
-    pub fn from(records: Vec<BostonRecord>) -> Self {
+impl DiabetesDataSet {
+    pub fn from(records: Vec<DiabetesRecord>) -> Self {
         let mut features = Vec::with_capacity(records.len());
         let mut labels = Vec::with_capacity(records.len());
 
@@ -62,14 +62,14 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut bfr = Vec::new();
 
     for result in rdr.deserialize() {
-        let record: BostonRecord = result?;
+        let record: DiabetesRecord = result?;
         bfr.push(record);
     }
 
-    let dataset = BostonDataSet::from(bfr);
+    let dataset = DiabetesDataSet::from(bfr);
     println!("Dataset size: {}", &dataset.features.nrows());
 
-    let train_dataset = BostonDataSet {
+    let train_dataset = DiabetesDataSet {
         features: dataset
             .features
             .slice_axis(Axis(0), Slice::from(0..450))
@@ -80,7 +80,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             .to_owned(),
     };
 
-    let test_dataset = BostonDataSet {
+    let test_dataset = DiabetesDataSet {
         features: dataset
             .features
             .slice_axis(Axis(0), Slice::from(450..))

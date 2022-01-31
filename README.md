@@ -31,12 +31,12 @@ curl https://wasmtime.dev/install.sh -sSf | bash
 
 #### Code
 
-```bash
+```
  git clone https://github.com/jnyfah/Enarx-Demo
  cd Enarx-Demo
  cargo build
  cargo run data/diabetes.csv
 ```
 
-**Please see [this wiki page](https://github.com/jnyfah/Enarx-Demo/wiki) for instructions.**
+**Please see [this wiki page](https://github.com/jnyfah/Enarx-Demo/wiki) for more instructions.**
 
