@@ -1,32 +1,29 @@
 use std::io;
+use std::{thread, time};
 
-fn fibonacci(n: u32) -> u32 {
-    match n {
-        0 => 0,
-        1 => 1,
-        _ => fibonacci(n - 1) + fibonacci(n - 2),
-    }
+fn fib (n: u32) -> u32 {
+    if n <= 0 {
+        return 0;
+    } else if n == 1 {
+        return 1;
+    }   fib(n - 1) + fib(n - 2)
+ }
+
+ fn main() {
+    let mut nth = String::new();
+
+    println!("Enter input: ");
+
+    io::stdin()
+        .read_line(&mut nth)
+        .expect("Failed to read line");
+
+    let nth: u32 = nth.trim().parse().expect("Please type a number!");
+
+    println!("Fibonacci: {}", fib(nth));
+
+  thread::sleep(time::Duration::from_secs(5));
+    
 }
 
-fn main() {
-    println!("Fibonacci generator");
-    println!("Type \"quit\" to end the program");
 
-    loop {
-        let mut n = String::new();
-
-        println!("\nEnter a positive integer:");
-
-        io::stdin().read_line(&mut n).expect("Failed to read line");
-
-        if n.trim() == "quit" {
-            break;
-        }
-
-        let n: u32 = match n.trim().parse() {
-            Ok(num) => num,
-            Err(_) => continue,
-        };
-        println!("{}", fibonacci(n));
-    }
-}
