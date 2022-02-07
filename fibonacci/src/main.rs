@@ -1,5 +1,4 @@
 use std::io;
-use std::{thread, time};
 
 fn fib (n: u32) -> u32 {
     if n <= 0 {
@@ -21,8 +20,6 @@ fn fib (n: u32) -> u32 {
     let nth: u32 = nth.trim().parse().expect("Please type a number!");
 
     println!("Fibonacci: {}", fib(nth));
-
-  thread::sleep(time::Duration::from_secs(5));
     
 }
 
