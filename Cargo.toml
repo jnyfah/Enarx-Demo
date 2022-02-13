@@ -11,3 +11,5 @@ ndarray = { version = "0.13"}
 approx = "0.3.2"
 csv = "1.1"
 serde = { version = "1", features = ["derive"] }
+mio = { git = "https://github.com/haraldh/mio.git", branch = "wasi", features=[ "os-poll", "net" ] }
+env_logger = { version = "0.8", default-features = false }
