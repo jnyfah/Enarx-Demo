@@ -1,3 +1,4 @@
+![backgroud image](static/img/enarx_simple_to_use_home(1).png)
 ![example workflow](https://github.com/jnyfah/Enarx-Demo/actions/workflows/rust.yml/badge.svg)
 # Enarx-Demo 
 
